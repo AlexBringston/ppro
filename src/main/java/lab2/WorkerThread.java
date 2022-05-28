@@ -1,19 +1,25 @@
 package lab2;
 
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 public class WorkerThread extends Thread {
+    private SynchronousQueue<WorkItem> queue;
 
-    private Queue<WorkItem> queue = new LinkedBlockingQueue();
-
+    public WorkerThread(SynchronousQueue<WorkItem> queue) {
+        this.queue = queue;
+    }
 
     @Override
     public void run() {
         while (true) {
-            WorkItem item = queue.poll();
+            WorkItem item = null;
+            try {
+                item = queue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-            if (item == null) {
+            if (item.getArgument() == null && item.getFunction() == null) {
                 return;
             }
 
@@ -21,11 +27,4 @@ public class WorkerThread extends Thread {
         }
     }
 
-    public Queue<WorkItem> getQueue() {
-        return queue;
-    }
-
-    public void setQueue(Queue<WorkItem> queue) {
-        this.queue = queue;
-    }
 }

@@ -8,8 +8,8 @@ public class FutureResult<T> {
 
     private boolean hasResult;
     private T result;
-    private Lock lock = new ReentrantLock();
-    private Condition condition = lock.newCondition();
+    private final Lock lock = new ReentrantLock();
+    private final Condition condition = lock.newCondition();
 
 
     public void setResult(T result) {
@@ -27,7 +27,7 @@ public class FutureResult<T> {
     public T getResult() throws InterruptedException {
         lock.lock();
         try {
-            while (!hasResult) {
+            if (!hasResult) {
                 condition.await();
             }
         }
